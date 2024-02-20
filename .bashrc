@@ -22,7 +22,13 @@ export NVM_DIR="$HOME/.nvm"
 LS_COLORS="di=0;35:ex=1;32:" 
 export LS_COLORS
 
+# run update/upgrade on open; make sure your terminal 
+# doesn't close or it will run again upon reopening
+sudo pacman -Syyu
+
 # Nothing to see here (believe me, nothing is down there)
+
+
 
 
 
