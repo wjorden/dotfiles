@@ -4,13 +4,6 @@ alias la='ls -a --color=auto'
 alias grep='grep --color=auto'
 
 #TMUX aliases
-# launch tmux in default directories
-CONFIG='/home/$USER/.config/tmux/.tmux.conf'
-WDIR='~/projects/bwo'
-CDIR='~/.config/'
-# web
-alias wmux='tmux && tmux -f $CONFIG new -A -s main -c $WDIR'
-# configs
-alias cmux='tmux && tmux -f $CONFIG new -A -s configs -c $CDIR'
+alias mmux='tmux && tmux new -A -s main'
 # kill tmux
 alias kmux='tmux kill-server'
