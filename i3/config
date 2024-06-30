@@ -17,7 +17,8 @@ exec_always --no-startup-id feh --bg-scale $wallpaper
 # PICOM
 exec_always --no-startup-id sleep 1 && picom -b --config /home/dwir/.config/picom/picom.conf
 # FRONT AUDIO JACK BROKEN
-bindsym $mod+F10 exec `pamixer -i 5`
+bindsym $mod+F11 exec `pamixer -i 5`
+bindsym $mod+F10 exec `pamixer --toggle-mute`
 bindsym $mod+F9 exec `pamixer -d 5`
 # start a terminal
 bindsym $mod+Return exec $terminal
