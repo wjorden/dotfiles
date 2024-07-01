@@ -1,0 +1,26 @@
+#! /bin/bash
+
+# DEBUG #
+# set -x
+
+# check run as root (sudo/doas)
+if [[ `id -u` -ne 0 ]]; then
+	echo Please run as root.
+	exit
+fi
+
+# VARS #
+# current kernel version (in case kernel gets updated)
+currKernel=$(uname -r)
+
+# run update
+pacman -Syyu
+
+# check if kernel was upgraded
+if [[ $currKernel != $(uname -r) ]]; then
+	echo Recommend a reset to update kernel.
+	read -p Reset now?[Y]es/[n]o res
+	if [[ $res == 'Y' || $res == 'y' ]]; then
+		sudo reboot now
+	fi
+fi
