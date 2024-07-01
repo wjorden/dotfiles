@@ -1,0 +1,26 @@
+#! /bin/bash
+
+# DEBUG #
+# set -x
+
+# check run as root (sudo/doas)
+if [[ `id -u` -ne 0 ]]; then
+	echo Please run as root.
+	exit
+fi
+
+# INSTALLS #
+# base
+echo Installing base packages...
+pacman -S base-devel cmake gdb git github-cli ripgrep fd man-db
+
+# AVR
+echo Installing AVR packages...
+pacman -S avr-binutils avr-gcc avr-gdb avr-libc avr-dude
+
+# STM32
+echo Installing STM packages...
+pacman -S arm-none-eabi-gcc arm-none-eabi-newlib
+
+echo Done installing...
+# DONE INSTALLS #
