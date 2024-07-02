@@ -3,27 +3,70 @@
 #################################################
 # 	The whole point of this is to make 	#
 #     sure the development packages required 	#
-#   are installed before beginning development 	#
-# 	of any bare metal platform.		#
+#   	are installed before beginning 		#
+#   	 development of any platforms.		#
+#-----------------------------------------------#
+# System    |  	Language  |      Package	#
+#-----------------------------------------------#
+#  Base	       ASM/C/C++       base-devel	#
+#  Git			      git/github-cli	#
+#  TERM			     fd/ripgrep/mad-db	#
+#  CMake          txt	          cmake		#
+#  Debug       ASM/C/C++      GDB/Valgrind	#
+#  AVR	       ASM/C/C++        GNU/Clang	#
+#  STM32       ASM/C/C++           GNU		#
+#  Raspberry     Python	       MicroPython	#
 #################################################
 
 # DEBUG #
 # set -x
 
-# check run as root (sudo/doas)
+# RUN AS ROOT # (sudo/doas)
 if [[ `id -u` -ne 0 ]]; then
-	printf "Please run as root."
+	printf "Please run as root.\n"
 	exit
 fi
 
-# INSTALLS #
-# base
-printf "Installing base packages..."
-pacman -S base-devel cmake gdb git github-cli ripgrep fd man-db
+# VARS #
+version=v0.1.01a
+clone=false
+cloneDir=/usr/.clones
 
-# setup git now?
-read -p 'Would you like to setup git now? [Y]es/[n]o ' -N 1 res
-res=${res:-y}
+Help(){
+	printf "########################################################################\n"
+	printf "#----------------> Fresh Install Development %s <----------------#\n"	$version
+	printf "#--------------------> Were Verobsity Is Default. <--------------------#\n"
+	printf "########################################################################\n"
+	printf "#-> Syntax: dev_installer [-d|h]\n"
+	printf "#-> Options:\n"
+	printf "##-> -d PATH	Specify path for git clones. Default is /usr/.clones/\n"
+	printf "##-> -	\n"
+	printf "##-> -h		Print this help.\n"
+}
+
+# Handle options
+while getopts cd:ht flag
+do 
+	case "${flag}" in
+		c)
+			clone=true;;
+		d) 
+			cloneDir=${OPTARG};;
+		h | t) 
+			Help 
+			exit;;
+	esac
+done
+
+# INSTALLS #
+# BASE #
+printf "Beginning installation of development packages.\n"
+printf "Installing base packages..."
+pacman -S base-devel gdb clang compiler-rt valgrind cmake git github-cli ripgrep fd man-db 
+
+# SETUP GIT #
+read -p 'Would you like to setup git now? [y]es/[N]o ' -N 1 res
+res=${res:-n}
 if [[ ${res,} == 'y' ]]; then
 	read -p Username: username
 	read -p Email: email
@@ -33,29 +76,48 @@ if [[ ${res,} == 'y' ]]; then
 	git config --global init.defaultBranch $branchName
 fi
 
-# warn about git problems
-printf "Git is installed but future activities, like cloning repos,\n
-	may not work if a user is not set."
-	
-# AVR
-printf "Installing AVR packages..."
-pacman -S avr-binutils avr-gcc avr-gdb avr-libc avr-dude
+# GIT WARN #
+printf "Git is installed but use (push) may not work if a user is not set."
 
-# STM32
-printf "Installing STM packages..."
-pacman -S arm-none-eabi-gcc arm-none-eabi-newlib
+read -p 'Would you like to install AVR packages? [y]es/[N]o ' -N 1 res
+res=${res:-n}
+# AVR #
+if [[ ${res,} == 'y' ]]; then
+	printf "Installing AVR packages..."
+	pacman -S avr-binutils avr-gcc avr-gdb avr-libc avr-dude
+fi
 
-# Raspberry
-printf "Cloning MicroPython"
-git clone https://github.com/wjorden/micropython
+read -p 'Would you like to install STM32 packages? [y]es/[N]o ' -N 1 res
+res=${res:-n}
+# STM32 #
+if [[ ${res,} == 'y' ]]; then
+	printf "Installing STM packages..."
+	pacman -S arm-none-eabi-gcc arm-none-eabi-newlib
+fi
 
-# prompt for mpy-cross
-# read -p Would you like to build for other boards? [y]es/[N]o -N 1 res
-# res=${res:-n}
-# if [[ ${res,} == 'y' ]]; then
-# 	read -p Please select the boards you want:
-#	printf "Need to finish this"
-# fi
+# CLONE DIRECTORY #
+while [[ -d $cloneDir ]]
+do
+	printf "%s already exists." $cloneDir
+	read -p "Where would you like to put git clones?" cloneDir
+done
+
+read -p 'Would you like to install MicroPython for Raspberry Pi? [y]es/[N]o ' -N 1 res
+res=${res:-n}
+# RASPBERRY #
+if [[ ${res,} == 'y' && clone ]]; then
+	makdir -p $cloneDir
+	printf "Cloning MicroPython...\n"
+	git clone https://github.com/micropython/micropython $cloneDir
+fi
+
+# MPY-CROSS #
+read -p Would you like to build for other boards? [y]es/[N]o -N 1 res
+res=${res:-n}
+if [[ ${res,} == 'y' ]]; then
+ 	# read -p Please select the boards you want:
+	printf "Need selection menu"
+fi
 
 printf "Done installing..."
 # DONE INSTALLS #
