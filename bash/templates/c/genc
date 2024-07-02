@@ -1,21 +1,22 @@
 #! /bin/bash
 
-# Default project name... Classic.
-project=test
+# DEBUG #
+# set -x
 
+# VARS #
+# default name
+project=test
 # Gotta help people somewhere
 Help(){
-	printf "########################################################################"
-	printf "#----------------> GenC - C Project Generator v0.1-1a <----------------#"
-	printf "#--------------------> Were Verobsity Is Default. <--------------------#"
-	printf "########################################################################"
-	printf
-	printf "#-> Syntax: genc [-p|g|b|h]"
-	printf "#-> Options:"
-	printf "##-> -p NAME	Specify project name. This will be the directory name."
-	printf "##-> -g		Run git init after everything is done."
-	printf "##-> -h		Print this help."
-	printf
+	printf "########################################################################\n"
+	printf "#----------------> GenC - C Project Generator v0.1-1a <----------------#\n"
+	printf "#--------------------> Were Verobsity Is Default. <--------------------#\n"
+	printf "########################################################################\n"
+	printf "#-> Syntax: genc [-p|g|b|h]\n"
+	printf "#-> Options:\n"
+	printf "##-> -p NAME	Specify project name. This will be the directory name.\n"
+	printf "##-> -g		Run git init after everything is done.\n"
+	printf "##-> -h		Print this help.\n"
 }
 
 # Handle options
@@ -29,43 +30,42 @@ do
 		h) 
 			Help 
 			exit;;
-		\?) 
-			printf "invalid option. Valid options are -p <name> -g<|optional, enable git<|"
-			exit ;;
 	esac
 done
 
 # prompt for project generation
-read -p Generate C project structure for $project? [y]es/[N]o -N 1 reply
-
+read -p 'Generate C project structure for $project? [y]es/[N]o ' -N 1 res 
+res=${res:-n}
 # check confirmation
-if ! [[ "$reply" =~ ^[yY]$ ]]; then
-	printf "Exiting..."
+if ! [[ $res =~ ^[yY]$ ]]; then
+	printf "\nExiting...\n"
 	exit
 # check for existing directory
 elif [ -d ./$project ]; then
-	printf "ERROR: Directory with the name %s exists.\n" $project
+	printf "\nERROR: Directory with the name %s exists.\n" $project
 	printf "Exiting...\n"
 	exit
 fi
 
 # Default is verbose
-printf "Making Directories..."
+printf "\nMaking Directories...\n"
 mkdir -p $PWD/$project $PWD/$project/src $PWD/$project/include $PWD/$project/lib $PWD/$project/build
-printf "Copying template source files!"
+printf "Copying template source files!\n"
 cp ~/.config/bash/templates/c/src/* $PWD/$project/src/
-printf "Copying template include files!"
+printf "Copying template include files!\n"
 cp ~/.config/bash/templates/c/include/* $PWD/$project/include/
-printf "Generating README!"
+printf "Generating README!\n"
 touch $PWD/$project/README.md
 printf "# %s" $project > $PWD/$project/README.md
-printf "Copying Makefile Template!"
+printf "Copying Makefile Template!\n"
 cp ~/.config/bash/templates/c/build/Makefile $PWD/$project/
 
 # git stuff
 if  [[ $git != 1  ]]; then
-	printf "Git not set."
+	printf "Git not set.\n"
 else
-	printf "Running git init."
+	printf "Running git init.\n"
 	git init -b main $PWD/$project/
 fi
+
+printf "Done.\n"
