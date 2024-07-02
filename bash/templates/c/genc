@@ -9,7 +9,7 @@ project=test
 # Gotta help people somewhere
 Help(){
 	printf "########################################################################\n"
-	printf "#----------------> GenC - C Project Generator v0.1-1a <----------------#\n"
+	printf "#----------------> GenC - C Project Generator v0.2-1a <----------------#\n"
 	printf "#--------------------> Were Verobsity Is Default. <--------------------#\n"
 	printf "########################################################################\n"
 	printf "#-> Syntax: genc [-p|g|b|h]\n"
