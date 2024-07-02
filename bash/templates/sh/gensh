@@ -1,8 +1,11 @@
 #! /bin/bash
 
 # DEBUG #
-set -x
+# set -x
 
+target=test
+addr=$HOME/.config/bash
+export gen_first_run=true
 # Gotta help people somewhere
 Help(){
 	printf "########################################################################\n"
@@ -12,16 +15,36 @@ Help(){
 	printf "#-> Syntax: gensh [-p|h]\n"
 	printf "#-> Options:\n"
 	printf "##-> -p NAME	Specify script name.\n"
+	printf "##-> -e		EDITOR env variable is set.\n"
 	printf "##-> -h		Print this help.\n"
 }
 
-while getopts flag
+while getopts p:eh flag
 do
 	case "${flag}" in
+		p)
+			target=${OPTARG};;
+		e)
+			;;
 		h)
 			Help
 			exit;;
 	esac
 done
 
+if [[ first ]];; then
+	if [[ -n $EDITOR ]]; then
+		printf "Please set EDITOR in your shell config.\n"
+		printf "Then run the script again with -e.\n"
+	fi
+	first=false
+fi
 
+printf "Making %s script...\n" $target
+cp $addr/templates/sh/base.sh $addr/$target
+chmod +x $addr/$target
+read -N 1 -p "Open $target? [y]es/[N]o" res
+if ! [[ $res =~ ^[nN]$ ]]; then
+	printf "Opening in %s..." $EDITOR
+	$EDITOR $addr/$target
+fi
