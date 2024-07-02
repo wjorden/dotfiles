@@ -1,0 +1,27 @@
+#! /bin/bash
+
+# DEBUG #
+set -x
+
+# Gotta help people somewhere
+Help(){
+	printf "########################################################################\n"
+	printf "#------------> GenShell - Shell Project Generator v0.1-1a <------------#\n"
+	printf "#--------------------> Were Verobsity Is Default. <--------------------#\n"
+	printf "########################################################################\n"
+	printf "#-> Syntax: gensh [-p|h]\n"
+	printf "#-> Options:\n"
+	printf "##-> -p NAME	Specify script name.\n"
+	printf "##-> -h		Print this help.\n"
+}
+
+while getopts flag
+do
+	case "${flag}" in
+		h)
+			Help
+			exit;;
+	esac
+done
+
+
