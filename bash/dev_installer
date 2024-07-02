@@ -62,7 +62,7 @@ done
 # BASE #
 printf "Beginning installation of development packages.\n"
 printf "Installing base packages..."
-pacman -S base-devel gdb clang compiler-rt valgrind cmake git github-cli ripgrep fd man-db 
+pacman -S base-devel clang compiler-rt gdb valgrind cmake git github-cli ripgrep fd man-db 
 
 # SETUP GIT #
 read -p 'Would you like to setup git now? [y]es/[N]o ' -N 1 res
@@ -79,22 +79,6 @@ fi
 # GIT WARN #
 printf "Git is installed but use (push) may not work if a user is not set."
 
-read -p 'Would you like to install AVR packages? [y]es/[N]o ' -N 1 res
-res=${res:-n}
-# AVR #
-if [[ ${res,} == 'y' ]]; then
-	printf "Installing AVR packages..."
-	pacman -S avr-binutils avr-gcc avr-gdb avr-libc avr-dude
-fi
-
-read -p 'Would you like to install STM32 packages? [y]es/[N]o ' -N 1 res
-res=${res:-n}
-# STM32 #
-if [[ ${res,} == 'y' ]]; then
-	printf "Installing STM packages..."
-	pacman -S arm-none-eabi-gcc arm-none-eabi-newlib
-fi
-
 # CLONE DIRECTORY #
 while [[ -d $cloneDir ]]
 do
@@ -102,25 +86,91 @@ do
 	read -p "Where would you like to put git clones?" cloneDir
 done
 
-read -p 'Would you like to install MicroPython for Raspberry Pi? [y]es/[N]o ' -N 1 res
-res=${res:-n}
-# RASPBERRY #
-if [[ ${res,} == 'y' && clone ]]; then
-	makdir -p $cloneDir
-	printf "Cloning MicroPython...\n"
-	git clone https://github.com/micropython/micropython $cloneDir
+# MAKE CLONE DIR #
+if [[ $clone ]]; then
+	printf "Making clone directory..."
+	mkdir -p $cloneDir
+
+	# CLONE AND BUILD #
+	# YAY
+	printf "Cloning yay..."
+	git clone https://aur.archlinux.org/yay-bin.git $cloneDir
+	cd $cloneDir/yay-bin
+	printf "Building and installing yay..."
+	mkpg -si
+
+	# NEOVIM
+	printf "Cloning neovim..."
+	git clone https://github.com/neovim/neovim $cloneDir
+	cd $cloneDir/neovim
+	printf "Building and installing neovim..."
+	make CMAKE_BUILD_TYPE=RelWithDebInfo CMAKE_INSTALL_PREFIX=/usr/bin install
+
+	# SDL
+	printf "Cloning SDL3..."
+	git clone https://github.com/libsdl-org/SDL $cloneDir
+	cd $cloneDir/SDL
+	printf "Building and installing SDL3..."
+	cmake -S . -B build  && cmake --build build  && cmake --install build
+
+	# SDL_IMAGE
+	printf "Cloning SDL_image..."
+	git clone https://github.com/libsdl-org/SDL_image $cloneDir
+	cd $cloneDir/SDL_image
+	printf "Building and installing SDL_image..."
+	cmake -S . -B build  && cmake --build build  && cmake --install build
+
+	# SDL_TTF
+	printf "Cloning SDL_ttf..."
+	git clone https://github.com/libsdl-org/SDL_ttf $cloneDir
+	cd $cloneDir/SDL_ttf
+	printf "Building and installing SDL_ttf..."
+	cmake -S . -B build  && cmake --build build  && cmake --install build
+
+	# RASPBERRY #
+	read -p 'Would you like to install MicroPython for Raspberry Pi? [y]es/[N]o ' -N 1 res
+	res=${res:-n}
+	if [[ ${res,} == 'y' && clone ]]; then
+		printf "Cloning MicroPython...\n"
+		git clone https://github.com/micropython/micropython $cloneDir
+	fi
+
+# END $clone #
 fi
+
+# AVR #
+read -p 'Would you like to install AVR packages? [y]es/[N]o ' -N 1 res
+res=${res:-n}
+if [[ ${res,} == 'y' ]]; then
+	printf "Installing AVR packages..."
+	pacman -S avr-binutils avr-gcc avr-gdb avr-libc avr-dude
+fi
+
+# STM32 #
+read -p 'Would you like to install STM32 packages? [y]es/[N]o ' -N 1 res
+res=${res:-n}
+if [[ ${res,} == 'y' ]]; then
+	printf "Installing STM packages..."
+	pacman -S arm-none-eabi-gcc arm-none-eabi-newlib
+fi
+
 
 # MPY-CROSS #
 read -p Would you like to build for other boards? [y]es/[N]o -N 1 res
 res=${res:-n}
 if [[ ${res,} == 'y' ]]; then
  	# read -p Please select the boards you want:
-	printf "Need selection menu"
+	printf "Need selection menu\n"
 fi
 
-printf "Done installing..."
 # DONE INSTALLS #
+printf "Done installing...\n"
+
+printf "Now that the packages are installed, it's time to add some projects.\n"
+printf "Use genc -h for help generating a C project. Project is created at\n"
+printf "	$PWD/project\n"
+printf "Use gensh -h for help generating a shell script. Script is created at\n"
+printf "	$HOME/bash/<script>"
 
 # COMPLETE #
 printf "Done."
