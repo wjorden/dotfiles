@@ -22,7 +22,7 @@ printf "Installing base packages..."
 pacman -S base-devel cmake gdb git github-cli ripgrep fd man-db
 
 # setup git now?
-read -p Would you like to setup git now? [Y]es/[n]o -N 1 res
+read -p 'Would you like to setup git now? [Y]es/[n]o ' -N 1 res
 res=${res:-y}
 if [[ ${res,} == 'y' ]]; then
 	read -p Username: username
@@ -36,6 +36,7 @@ fi
 # warn about git problems
 printf "Git is installed but future activities, like cloning repos,\n
 	may not work if a user is not set."
+	
 # AVR
 printf "Installing AVR packages..."
 pacman -S avr-binutils avr-gcc avr-gdb avr-libc avr-dude
@@ -48,7 +49,16 @@ pacman -S arm-none-eabi-gcc arm-none-eabi-newlib
 printf "Cloning MicroPython"
 git clone https://github.com/wjorden/micropython
 
-# prompt for stm32 cross
-read -p Would you like to build for other boards? [y]es/[N]o -N 1 res
+# prompt for mpy-cross
+# read -p Would you like to build for other boards? [y]es/[N]o -N 1 res
+# res=${res:-n}
+# if [[ ${res,} == 'y' ]]; then
+# 	read -p Please select the boards you want:
+#	printf "Need to finish this"
+# fi
+
 printf "Done installing..."
 # DONE INSTALLS #
+
+# COMPLETE #
+printf "Done."
