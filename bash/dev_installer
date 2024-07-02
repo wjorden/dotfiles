@@ -1,26 +1,54 @@
 #! /bin/bash
 
+#################################################
+# 	The whole point of this is to make 	#
+#     sure the development packages required 	#
+#   are installed before beginning development 	#
+# 	of any bare metal platform.		#
+#################################################
+
 # DEBUG #
 # set -x
 
 # check run as root (sudo/doas)
 if [[ `id -u` -ne 0 ]]; then
-	echo Please run as root.
+	printf "Please run as root."
 	exit
 fi
 
 # INSTALLS #
 # base
-echo Installing base packages...
+printf "Installing base packages..."
 pacman -S base-devel cmake gdb git github-cli ripgrep fd man-db
 
+# setup git now?
+read -p Would you like to setup git now? [Y]es/[n]o -N 1 res
+res=${res:-y}
+if [[ ${res,} == 'y' ]]; then
+	read -p Username: username
+	read -p Email: email
+	read -p Default branch name: branchName
+	git config --global user.name $username
+	git config --global user.email $email
+	git config --global init.defaultBranch $branchName
+fi
+
+# warn about git problems
+printf "Git is installed but future activities, like cloning repos,\n
+	may not work if a user is not set."
 # AVR
-echo Installing AVR packages...
+printf "Installing AVR packages..."
 pacman -S avr-binutils avr-gcc avr-gdb avr-libc avr-dude
 
 # STM32
-echo Installing STM packages...
+printf "Installing STM packages..."
 pacman -S arm-none-eabi-gcc arm-none-eabi-newlib
 
-echo Done installing...
+# Raspberry
+printf "Cloning MicroPython"
+git clone https://github.com/wjorden/micropython
+
+# prompt for stm32 cross
+read -p Would you like to build for other boards? [y]es/[N]o -N 1 res
+printf "Done installing..."
 # DONE INSTALLS #
