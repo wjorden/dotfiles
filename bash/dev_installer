@@ -74,6 +74,8 @@ done
 # MAKE CLONE DIR #
 printf "\nMaking clone directory...\n"
 mkdir -p $cloneDir
+# CHANGE OWNER FOR MAKEPKG #
+chown $USER $cloneDir
 
 # CLONE AND BUILD #
 # PARU
@@ -147,7 +149,7 @@ fi
 # INSTALL AUR PACKAGES #
 printf "Installing AUR packages using paru...\n"
 if [[ -f `find -name paru` ]]; then
-	paru -S nvm
+	paru -S nvm mongodb mongodb-tools
 fi
 
 # DONE INSTALLS #
