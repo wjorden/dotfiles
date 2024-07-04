@@ -149,7 +149,7 @@ fi
 # INSTALL AUR PACKAGES #
 printf "Installing AUR packages using paru...\n"
 if [[ -f `find -name paru` ]]; then
-	paru -S nvm mongodb mongodb-tools mongosh-bin
+	paru -S nvm
 fi
 
 # DONE INSTALLS #
