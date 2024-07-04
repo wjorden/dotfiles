@@ -19,7 +19,7 @@
 #################################################
 
 # DEBUG #
-# set -x
+ set -x
 
 # RUN AS ROOT # (sudo/doas)
 if [[ `id -u` -ne 0 ]]; then
@@ -28,41 +28,26 @@ if [[ `id -u` -ne 0 ]]; then
 fi
 
 # VARS #
-version=v0.1.01a
-clone=false
+version=v0.1.04a
 cloneDir=/usr/.clones
 
-Help(){
+Header(){
 	printf "########################################################################\n"
 	printf "#----------------> Fresh Install Development %s <----------------#\n"	$version
 	printf "#--------------------> Were Verobsity Is Default. <--------------------#\n"
 	printf "########################################################################\n"
-	printf "#-> Syntax: dev_installer [-d|h]\n"
-	printf "#-> Options:\n"
-	printf "##-> -d PATH	Specify path for git clones. Default is /usr/.clones/\n"
-	printf "##-> -	\n"
-	printf "##-> -h		Print this help.\n"
+
 }
 
-# Handle options
-while getopts cd:ht flag
-do 
-	case "${flag}" in
-		c)
-			clone=true;;
-		d) 
-			cloneDir=${OPTARG};;
-		h | t) 
-			Help 
-			exit;;
-	esac
-done
 
-# INSTALLS #
-# BASE #
+# UPDATE pacman #
+source update
+
+# INSTALL OFFICIAL PACKAGES #
+Header
 printf "Beginning installation of development packages.\n"
-printf "Installing base packages..."
-pacman -S base-devel clang compiler-rt gdb valgrind cmake git github-cli ripgrep fd man-db 
+printf "Installing base packages...\n"
+pacman -S base-devel clang compiler-rt gdb valgrind cmake git github-cli ripgrep fd man-db kitty
 
 # SETUP GIT #
 read -p 'Would you like to setup git now? [y]es/[N]o ' -N 1 res
@@ -77,90 +62,92 @@ if [[ ${res,} == 'y' ]]; then
 fi
 
 # GIT WARN #
-printf "Git is installed but use (push) may not work if a user is not set."
+printf "\nGit is installed but use (push) may not work if a user is not set.\n"
 
 # CLONE DIRECTORY #
 while [[ -d $cloneDir ]]
 do
-	printf "%s already exists." $cloneDir
-	read -p "Where would you like to put git clones?" cloneDir
+	printf "%s already exists.\n" $cloneDir
+	read -p "Where would you like to put git clones? " cloneDir
 done
 
 # MAKE CLONE DIR #
-if [[ $clone ]]; then
-	printf "Making clone directory..."
-	mkdir -p $cloneDir
+printf "\nMaking clone directory...\n"
+mkdir -p $cloneDir
 
-	# CLONE AND BUILD #
-	# YAY
-	printf "Cloning yay..."
-	git clone https://aur.archlinux.org/yay-bin.git $cloneDir
-	cd $cloneDir/yay-bin
-	printf "Building and installing yay..."
-	mkpg -si
+# CLONE AND BUILD #
+# PARU
+printf "Cloning paru...\n"
+git clone https://aur.archlinux.org/paru.git $cloneDir/paru
+cd $cloneDir/paru && mkpkg -si
 
-	# NEOVIM
-	printf "Cloning neovim..."
-	git clone https://github.com/neovim/neovim $cloneDir
-	cd $cloneDir/neovim
-	printf "Building and installing neovim..."
-	make CMAKE_BUILD_TYPE=RelWithDebInfo CMAKE_INSTALL_PREFIX=/usr/bin install
+# NEOVIM
+printf "Cloning neovim...\n"
+git clone https://github.com/neovim/neovim $cloneDir/neovim
+cd $cloneDir/neovim
+printf "Building and installing neovim...\n"
+make CMAKE_BUILD_TYPE=RelWithDebInfo CMAKE_INSTALL_PREFIX=/usr/bin install
 
-	# SDL
-	printf "Cloning SDL3..."
-	git clone https://github.com/libsdl-org/SDL $cloneDir
-	cd $cloneDir/SDL
-	printf "Building and installing SDL3..."
-	cmake -S . -B build  && cmake --build build  && cmake --install build
+# SDL
+printf "Cloning SDL3..."
+git clone https://github.com/libsdl-org/SDL $cloneDir/SDL
+cd $cloneDir/SDL
+printf "Building and installing SDL3...\n"
+cmake -S $cloneDir/SDL -B $cloneDir/SDL/build  && cmake --build $cloneDir/SDL/build  && cmake --install $cloneDir/SDL/build
 
-	# SDL_IMAGE
-	printf "Cloning SDL_image..."
-	git clone https://github.com/libsdl-org/SDL_image $cloneDir
-	cd $cloneDir/SDL_image
-	printf "Building and installing SDL_image..."
-	cmake -S . -B build  && cmake --build build  && cmake --install build
+# SDL_IMAGE
+printf "Cloning SDL_image...\n"
+git clone https://github.com/libsdl-org/SDL_image $cloneDir/SDL_image
+cd $cloneDir/SDL_image
+printf "Building and installing SDL_image...\n"
+cmake -S $cloneDir/SDL_image -B $cloneDir/SDL_image/build  && cmake --build $cloneDir/SDL_image/build  && cmake --install $cloneDir/SDL_image/build
 
-	# SDL_TTF
-	printf "Cloning SDL_ttf..."
-	git clone https://github.com/libsdl-org/SDL_ttf $cloneDir
-	cd $cloneDir/SDL_ttf
-	printf "Building and installing SDL_ttf..."
-	cmake -S . -B build  && cmake --build build  && cmake --install build
+# SDL_TTF
+printf "Cloning SDL_ttf...\n"
+git clone https://github.com/libsdl-org/SDL_ttf $cloneDir/SDL_ttf
+cd $cloneDir/SDL_ttf
+printf "Building and installing SDL_ttf...\n"
+cmake -S $cloneDir/SDL_ttf -B build  && cmake --build $cloneDir/SDL_ttf/build  && cmake --install $cloneDir/SDL_ttf/build
 
-	# RASPBERRY #
-	read -p 'Would you like to install MicroPython for Raspberry Pi? [y]es/[N]o ' -N 1 res
-	res=${res:-n}
-	if [[ ${res,} == 'y' && clone ]]; then
-		printf "Cloning MicroPython...\n"
-		git clone https://github.com/micropython/micropython $cloneDir
-	fi
+# RASPBERRY #
+read -p 'Would you like to install MicroPython for Raspberry Pi? [y]es/[N]o ' -N 1 res
+res=${res:-n}
+if [[ ${res,} == 'y' && clone ]]; then
+	printf "\nCloning MicroPython...\n"
+	git clone https://github.com/micropython/micropython $cloneDir/
+fi
 
 # END $clone #
-fi
 
 # AVR #
 read -p 'Would you like to install AVR packages? [y]es/[N]o ' -N 1 res
 res=${res:-n}
 if [[ ${res,} == 'y' ]]; then
-	printf "Installing AVR packages..."
+	printf "/nInstalling AVR packages...\n"
 	pacman -S avr-binutils avr-gcc avr-gdb avr-libc avr-dude
 fi
 
 # STM32 #
-read -p 'Would you like to install STM32 packages? [y]es/[N]o ' -N 1 res
+read -p $'\nWould you like to install STM32 packages? [y]es/[N]o ' -N 1 res
 res=${res:-n}
 if [[ ${res,} == 'y' ]]; then
-	printf "Installing STM packages..."
+	printf "/nInstalling STM packages...\n"
 	pacman -S arm-none-eabi-gcc arm-none-eabi-newlib
 fi
 
 
 # MPY-CROSS #
-read -p Would you like to build for other boards? [y]es/[N]o -N 1 res
+read -p $'\nWould you like to build for other boards? [y]es/[N]o '-N 1 res
 res=${res:-n}
 if [[ ${res,} == 'y' ]]; then
  	# read -p Please select the boards you want:
 	printf "Need selection menu\n"
+fi
+
+# INSTALL AUR PACKAGES #
+printf "Installing AUR packages using paru...\n"
+if [[ -f `find -name paru` ]]; then
+	paru -S nvm
 fi
 
 # DONE INSTALLS #
@@ -170,7 +157,7 @@ printf "Now that the packages are installed, it's time to add some projects.\n"
 printf "Use genc -h for help generating a C project. Project is created at\n"
 printf "	$PWD/project\n"
 printf "Use gensh -h for help generating a shell script. Script is created at\n"
-printf "	$HOME/bash/<script>"
+printf "	$HOME/bash/<script>\n"
 
 # COMPLETE #
-printf "Done."
+printf "Done.\n"
