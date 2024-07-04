@@ -4,8 +4,9 @@ set $browser firefox
 set $terminal kitty 
 set $menu "rofi -show drun run" 
 set $wallpaper ~/.imgs/johannes-plenio.jpg
+
 # FONT
-font pango:JetBrainsMonoNerd 8
+font pango:JetBrainsMonoNerd 12
 # LAUNCH i3
 exec --no-startup-id dex --autostart --environment i3
 # LOCK
